@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 
 dotenv.config();
-router.use(express.json);
+router.use(express.json());
 
 router
     .route('/:param_bookId')
