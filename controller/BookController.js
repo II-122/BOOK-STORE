@@ -13,20 +13,19 @@ const checkBooks = (req, res) => {
     // offset : 0, (currentPage-1) * limit
     let offset = limit * (currentPage - 1);
 
-    let sql = `SELECT * FROM books`;
+    let sql = `SELECT *, (SELECT count(*) FROM likes WHERE books.books_id = likes_bookId) AS books_likes FROM books`;
     let values = [];
     if(categoryId && newBook) {
-        sql += ` WHERE books_categoryId = ? 
-                AND books_pubDate BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()`;
-        values = values.push(categoryId);
+        sql += ` WHERE books_categoryId = ? AND books_pubDate BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()`;
+        values.push(categoryId);
     } else if (categoryId) {
         sql += ` WHERE books_categoryId = ?`;
-        values = values.push(categoryId);
+        values.push(categoryId);
     } else if(newBook){
         sql += ` WHERE books_pubDate BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()`;
     }
     sql += ` LIMIT ? OFFSET ?`;
-    values = values.push(parseInt(limit), offset);
+    values.push(parseInt(limit), offset);
     
     conn.query(sql, values, (err, results) => {
         if(err) {
@@ -42,11 +41,18 @@ const checkBooks = (req, res) => {
 }; 
 
 const checkBook = (req, res) => {
-    const { param_bookId } = req.params;
+    const { users_id } = req.body;
+    const param_bookId = req.params.param_bookId;
     
-    let sql = `SELECT * FROM books LEFT JOIN category 
-                ON books.books_categoryId = category.category_id WHERE books.books_id = ?;`;
-    conn.query(sql, param_bookId, (err, results) => {
+    let sql = `SELECT *,
+	             (SELECT count(*) FROM likes WHERE books.books_id = likes_bookId) AS books_likes,
+	             (SELECT EXISTS (SELECT * FROM likes WHERE likes_userId = ? AND likes_bookId = ?)) AS book_liked
+	             FROM books
+                 LEFT JOIN category
+	             ON books.books_categoryId = category.category_id
+                 WHERE books.books_id = ?`;
+    let values = [users_id, parseInt(param_bookId), parseInt(param_bookId)];
+    conn.query(sql, values, (err, results) => {
         if(err) {
             return res.status(StatusCodes.BAD_REQUEST).end();
         }

@@ -2,20 +2,16 @@
 
 const express = require('express');
 const router = express.Router();
-const { body, param, validationResult } = require('express-validator');
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
+const {
+    addLike,
+    cancleLike
+} = require('../controller/LikesController.js');
 
-dotenv.config();
 router.use(express.json());
 
 router
     .route('/:param_bookId')
-    .post((req, res) => {
-        res.status(200).json("좋아요 추가");
-    })  // 1. 좋아요 추가
-    .delete((req, res) => {
-        res.status(200).json("좋아요 취소");
-    }); // 2. 좋아요 취소
+    .post(addLike)  // 1. 좋아요 추가
+    .delete(cancleLike); // 2. 좋아요 취소
 
 module.exports = router;
