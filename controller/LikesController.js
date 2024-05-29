@@ -1,6 +1,8 @@
 // 2024-05-27 create
 
 const conn = require('../mariadb.js');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');   // node.js 내장 모듈 : 암호화
 const { StatusCodes } = require('http-status-codes');
 // const { body, param, validationResult } = require('express-validator');
 const dotenv = require('dotenv');
