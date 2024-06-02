@@ -41,17 +41,18 @@ const cartItems = (req, res) => {
 };
 
 const removeCartItem = (req, res) => {
-    // const { cartItemId } = req.body;
+    const { param_cartItemId } = req.params;
+    const { userId } = req.body;
 
-    // let sql = `DELETE FROM cartItems WHERE cartItems_id = ?;`;
-    // conn.query(sql, cartItemId, (err, results) => {
-    //     if(err) {
-    //         return res.status(StatusCodes.BAD_REQUEST).end();
-    //     }
+    let sql = `DELETE FROM cartItems WHERE cartItems_id = ? AND cartItems_userId = ?`;
+    let values = [param_cartItemId, userId];
+    conn.query(sql, values, (err, results) => {
+        if(err) {
+            return res.status(StatusCodes.BAD_REQUEST).end();
+        }
 
-    //     return res.status(StatusCodes.OK).json(results);
-    // });
-    res.status(StatusCodes.OK).send('장바구니 아이템 삭제');
+        return res.status(StatusCodes.OK).json(results);
+    });
 };
 
 module.exports = {
